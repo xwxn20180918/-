@@ -21,5 +21,6 @@
 @import './common/stylus/mixins.styl'
   #app
     height 100%
+    min-width 1366px
  
 </style>
