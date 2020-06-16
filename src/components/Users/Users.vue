@@ -316,6 +316,7 @@ export default {
         this.$message.success("数据更新成功");
       });
     },
+    //删除用户信息
     async deleteUserinfo(id) {
       console.log(id);
       const deleteConfirm = await this.$confirm(
