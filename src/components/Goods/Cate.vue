@@ -233,7 +233,7 @@ export default {
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
-@import '../../common/stylus/mixins.styl';
+@import '../../common/stylus/mixins.styl'
 
 .el-card {
   margin-top: 15px;
