@@ -13,6 +13,7 @@ import Params from '../components/Goods/Params.vue'
 import List from '../components/Goods/List.vue'
 import Add from '../components/Goods/Add.vue'
 import Order from '../components/Order/Order.vue'
+import Report from '../components/Report/Report.vue'
 
 Vue.use(Router)
 //解决location错误
@@ -69,6 +70,10 @@ const router = new Router({
                 {
                   path:'/orders',
                   component:Order,
+                },
+                {
+                  path:'/reports',
+                  component:Report,
                 },
                 {
                   path:'/',
