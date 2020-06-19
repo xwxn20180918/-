@@ -3,6 +3,19 @@ import App from './App.vue'
 import router from './router'
 import './plugins/element.js'
 import '../public/css/index.css'
+import format from 'date-fns/format'
+import VueQuillEditor from 'vue-quill-editor'
+
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
+Vue.use(VueQuillEditor, /* { default global options } */)
+
+//自定义过滤器
+Vue.filter('date-format',(value,formats='yyyy-MM-dd HH:mm:ss') => {
+  return format(value,formats)
+})
 
 import axios from 'axios'
 

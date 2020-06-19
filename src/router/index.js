@@ -10,6 +10,8 @@ import Rights from '../components/Power/Rights.vue'
 import Roles from '../components/Power/Roles.vue'
 import Cate from '../components/Goods/Cate.vue'
 import Params from '../components/Goods/Params.vue'
+import List from '../components/Goods/List.vue'
+import Add from '../components/Goods/Add.vue'
 
 Vue.use(Router)
 //解决location错误
@@ -44,8 +46,8 @@ const router = new Router({
                   component:Rights
                 },
                 {
-                    path:'/roles',
-                    component:Roles
+                  path:'/roles',
+                  component:Roles
                 },
                 {
                   path:'/categories',
@@ -54,6 +56,14 @@ const router = new Router({
                 {
                   path:'/params',
                   component:Params
+                },
+                {
+                  path:'/goods',
+                  component:List,
+                },
+                {
+                  path:'/add',
+                  component:Add,
                 },
                 {
                   path:'/',
