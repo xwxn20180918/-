@@ -72,11 +72,12 @@ export default {
     },
     async getMenuList(){
       const {data} = await this.$http.get('menus')
-      console.log(data)
+      
       if(data.meta.status !== 200){
         return this.$message.error(data.meta.msg)
       }
         this.menuList = data.data
+        console.log(this.menuList)
     },
     toggleMenu(){
       this.isShowMenu= !this.isShowMenu

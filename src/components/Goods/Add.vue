@@ -8,7 +8,7 @@
     </el-breadcrumb>
     <!-- 卡片 -->
     <el-card>
-      <el-alert title="消息提示的文案" type="info" center show-icon></el-alert>
+      <el-alert title="消息提示的文案" type="info" center show-icon :closable="false"></el-alert>
       <!-- 步骤条 -->
 
       <el-steps :space="200" :active="activeIndex - 0" finish-status="success" align-center>

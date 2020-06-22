@@ -55,15 +55,15 @@ export default {
   async mounted() {
     //2 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById("main"));
-    //发发送获取折线图数据请求
+    //3 发发送获取折线图数据请求
     const { data } = await this.$http.get("reports/type/1");
     if (data.meta.status !== 200) {
       return this.$message.error("获取折线图失败");
     }
 
-    //3 指定图表的配置项和数据
+    //4 指定图表的配置项和数据
     const result = _.merge(data.data,this.options)
-    //4 使用刚指定的配置项和数据显示图表。
+    //5 使用刚指定的配置项和数据显示图表。
     myChart.setOption(result);
   },
   components: {}

@@ -33,7 +33,8 @@
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180px">
-          <!-- 按钮 -->
+          <!-- 按钮组-->
+          <!-- 修改按钮-->
           <template slot-scope="scope">
             <el-button
               type="primary"
@@ -41,12 +42,14 @@
               size="mini"
               @click="editButton(scope.row.id)"
             ></el-button>
+            <!-- 删除按钮 -->
             <el-button
               type="danger"
               icon="el-icon-delete"
               size="mini"
               @click="deleteUserinfo(scope.row.id)"
             ></el-button>
+            <!-- 分配角色按钮 -->
             <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
               <el-button
                 type="success"
@@ -196,7 +199,9 @@ export default {
         ]
       },
       editDialog: false, //默然不显示修改对话框
-      editData: {}, //查询的用户数据
+      editData: {
+        
+      }, //查询的用户数据
       editrules: {
         email: [
           { required: true, message: "请输入邮箱", trigger: "blur" },
@@ -209,7 +214,7 @@ export default {
       },
       //默认分配角色对话框不显示
       isShowDialogdialogVisible: false,
-      //分配角色的userinfo
+      //需要被分配角色的用户信息
       userinfo: {},
       //分配角色数据列表
       userinfoList: [],
@@ -221,6 +226,7 @@ export default {
     this.getUsersList();
   },
   methods: {
+    //获取数据列表
     async getUsersList() {
       const { data } = await this.$http.get("users", {
         params: this.queryList
@@ -234,17 +240,18 @@ export default {
       console.log(data);
     },
     //监听事件 pagesize改变的事件
-    handleSizeChange(size) {
-      console.log(size);
-      this.queryList.pagesize = size;
+    handleSizeChange(newSize) {
+      console.log(newSize);
+      this.queryList.pagesize = newSize;
       this.getUsersList();
     },
     //监听事件 页码值改变的事件
-    handleCurrentChange(page) {
-      console.log(page);
-      this.queryList.pagenum = page;
+    handleCurrentChange(newNum) {
+      console.log(newNum);
+      this.queryList.pagenum = newNum;
       this.getUsersList();
     },
+    //发送修改用户状态请求
     async isShowMgState(userinfo) {
       console.log(userinfo);
       const { data } = await this.$http.put(
@@ -263,6 +270,7 @@ export default {
     },
     //添加用户
     addUsers() {
+      //先进行表单验证
       this.$refs.ruleForm.validate(async valid => {
         if (!valid) {
           return;
@@ -279,6 +287,7 @@ export default {
         this.getUsersList();
       });
     },
+    //查询用户信息
     async editButton(id) {
       //查询用户信息
       // console.log(id);
@@ -287,6 +296,7 @@ export default {
         return this.$message.error("查询数据失败");
       }
       this.editData = data.data;
+      console.log(this.editData)
       this.editDialog = true;
     },
     //修改表单关闭之后 重置用户信息
@@ -319,6 +329,7 @@ export default {
     //删除用户信息
     async deleteUserinfo(id) {
       console.log(id);
+      //首先进行弹框确认是否删除 confirm 返回的是一个promise对象
       const deleteConfirm = await this.$confirm(
         "此操作将永久删除用户, 是否继续?",
         "提示",

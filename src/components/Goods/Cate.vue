@@ -34,9 +34,9 @@
           <el-tag type="success" v-else-if="scope.row.cat_level === 1">二级</el-tag>
           <el-tag type="warning" v-else>三级</el-tag>
         </template>
-        <template slot="option" slot-scope>
-          <el-button type="primary" icon="el-icon-edit">修改</el-button>
-          <el-button type="danger" icon="el-icon-delete">删除</el-button>
+        <template slot="option" slot-scope="scope">
+          <el-button size="mini" type="primary" icon="el-icon-edit" @click="editCate(scope.row.cat_id)">修改</el-button>
+          <el-button size="mini" type="danger" icon="el-icon-delete" @click="removeCate(scope.row.cat_id)">删除</el-button>
         </template>
       </tree-table>
       <!-- 分页 -->
@@ -58,10 +58,13 @@
           <el-input v-model="addruleForm.cat_name"></el-input>
         </el-form-item>
         <el-form-item label="父级分类:">
-          <el-cascader :props="cascaderProps" clearable filterable
+          <el-cascader
+            :props="cascaderProps"
+            clearable
+            filterable
             v-model="selectedKeys"
             :options="parentCateList"
-             expand-trigger= 'hover'
+            expand-trigger="hover"
             @change="handleChange"
           ></el-cascader>
         </el-form-item>
@@ -69,6 +72,23 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="adddialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="addCate">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 修改对话框 -->
+    <el-dialog title="修改商品" :visible.sync="editDialogVisible" width="50%" @close="editDialogClosed">
+      <el-form
+        :model="editRuleForm"
+        :rules="editRuleFormRules"
+        ref="ruleFormRef"
+        label-width="100px"
+      >
+        <el-form-item label="分类名称" prop="cat_name">
+          <el-input v-model="editRuleForm.cat_name"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="edit">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -131,13 +151,25 @@ export default {
       //父级分类数据（只有两级）
       parentCateList: [],
       //指定级联选择器对象
-        cascaderProps:{
-          value:'cat_id',
-          label:'cat_name',
-          children:'children'
-        },
-        //选中父级分类的id数组
-        selectedKeys:[]
+      cascaderProps: {
+        value: "cat_id",
+        label: "cat_name",
+        children: "children"
+      },
+      //选中父级分类的id数组
+      selectedKeys: [],
+      //修改商品对话框
+      editDialogVisible: false,
+      //修改表单的数据
+      editRuleForm:{
+
+      },
+      //修改表单规则
+      editRuleFormRules:{
+        cat_name:[
+            { required: true, message: '请输入分类名称', trigger: 'blur' },
+        ]
+      }
     };
   },
   created() {
@@ -151,7 +183,7 @@ export default {
       if (data.meta.status !== 200) {
         return this.$message.error("获取商品列表失败");
       }
-      //  console.log(data.data)
+      console.log(data.data);
       this.cateList = data.data.result;
       this.total = data.data.total;
     },
@@ -185,47 +217,102 @@ export default {
       console.log(data.data);
     },
     //选择项发生变化触发这个函数
-    handleChange(){
-      console.log(this.selectedKeys)
+    handleChange() {
+      console.log(this.selectedKeys);
       //如果当selectedKeys数组length大于0时 则表示选中了父级分类
       //如果没有 则表示没有选中父级
-      if(this.selectedKeys.length > 0){
+      if (this.selectedKeys.length > 0) {
         //当前父级id
-        this.addruleForm.cat_pid = this.selectedKeys[this.selectedKeys.length-1] 
+        this.addruleForm.cat_pid = this.selectedKeys[
+          this.selectedKeys.length - 1
+        ];
         //当前父级等级
-        this.addruleForm.cat_level =  this.selectedKeys.length  
-      }else{
-        this.addruleForm.cat_pid = 0
-        this.addruleForm.cat_level =0
+        this.addruleForm.cat_level = this.selectedKeys.length;
+      } else {
+        this.addruleForm.cat_pid = 0;
+        this.addruleForm.cat_level = 0;
       }
     },
     //点击按钮 添加新分类
-    addCate(){
+    addCate() {
       // console.log(this.addruleForm)
       this.$refs.ruleFormRef.validate(async valid => {
-        if(!valid){
-          return this.$message.error('验证失败')
+        if (!valid) {
+          return this.$message.error("验证失败");
         }
-          //发起添加分类请求
-         const {data} = await this.$http.post('categories',this.addruleForm)
-         if(data.meta.status !== 201){
-           return this.$message.error('添加分类失败')
-         }
-           this.$message.success('添加分类成功')
-           this.getCateList()
-           this.adddialogVisible = false
-      })
+        //发起添加分类请求
+        const { data } = await this.$http.post("categories", this.addruleForm);
+        if (data.meta.status !== 201) {
+          return this.$message.error("添加分类失败");
+        }
+        this.$message.success("添加分类成功");
+        this.getCateList();
+        this.adddialogVisible = false;
+      });
     },
     //点击添加对话框的取消按钮 重置表单数据
-    addCateClosed(){
+    addCateClosed() {
       //重置第一个表单
-      this.$refs.ruleFormRef.resetFields()
+      this.$refs.ruleFormRef.resetFields();
       //重置vmodel绑定的数组
-      this.selectedKeys = []
+      this.selectedKeys = [];
       //一定要再次清楚 fenlei的父id  和层级 让其空间干净 不会影响后续操作
-      this.addruleForm.cat_pid = 0
-      this.addruleForm.cat_level =0
-
+      this.addruleForm.cat_pid = 0;
+      this.addruleForm.cat_level = 0;
+    },
+    //点击修改按钮
+   async editCate(cat_id) {
+      //获取获取商品的id
+     const {data} = await this.$http.get('categories/'+cat_id)
+     if(data.meta.status !== 200){
+       return this.$message.error('查询失败')
+     }
+      this.$message.success('查询成功')
+      this.editRuleForm = data.data
+      console.log(data.data)
+      this.editDialogVisible = true;
+    },
+    //修改商品
+    edit(){
+      //先进行表单验证
+      this.$refs.ruleFormRef.validate(async valid => {
+        if(!valid){
+          return
+        }
+        //发起修改请求
+       const {data} = await this.$http.put('categories/'+this.editRuleForm.cat_id,{
+          cat_name:this.editRuleForm.cat_name
+        })
+        if(data.meta.status !== 200){
+          return this.$message.error('编辑失败')
+        }
+          this.$message.success('编辑成功')
+          this.getCateList()
+          this.editDialogVisible = false
+      })
+    },
+    //重置表单数据
+    editDialogClosed(){
+      this.$refs.ruleFormRef.resetFields()
+    },
+    //点击删除商品
+  async removeCate(cat_id){
+      //先进行确认弹窗提示
+      const confirmResult = await this.$confirm('此操作将永久删除该商品, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).catch(err => err)
+      if(confirmResult !== 'confirm'){
+        return this.$message.error('点击了取消')
+      }
+      //发送删除请求
+     const {data} = await this.$http.delete('categories/'+cat_id)
+     if(data.meta.status !== 200){
+       return this.$message.error('删除失败')
+     }
+       this.$message.success('删除成功')
+       this.getCateList()
     }
   },
   components: {}
@@ -233,7 +320,7 @@ export default {
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
-@import '../../common/stylus/mixins.styl'
+@import '../../common/stylus/mixins.styl';
 
 .el-card {
   margin-top: 15px;
@@ -243,12 +330,12 @@ export default {
   }
 }
 
-//解决高度太高的问题
+// 解决高度太高的问题
 .el-cascader-menu {
-    height: 300px;
-}
-.el-cascader{
-    width: 100%;
+  height: 300px;
 }
 
+.el-cascader {
+  width: 100%;
+}
 </style>

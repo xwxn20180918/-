@@ -10,8 +10,8 @@
     <el-card>
       <el-row>
         <el-col :span="8">
-          <el-input placeholder="请输入内容">
-            <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-input placeholder="请输入内容" v-model="queryInfo.query" clearable @clear="getOrderList()">
+            <el-button slot="append" icon="el-icon-search" @click="getOrderList()"></el-button>
           </el-input>
         </el-col>
       </el-row>
@@ -34,8 +34,8 @@
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope>
-            <el-button type="primary" icon="el-icon-edit" @click="isShowEditAddress"></el-button>
-            <el-button type="success" icon="el-icon-location" @click="isShowLocalhostAddress"></el-button>
+            <el-button size="mini" type="primary" icon="el-icon-edit" @click="isShowEditAddress"></el-button>
+            <el-button size="mini" type="success" icon="el-icon-location" @click="isShowLocalhostAddress"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -63,7 +63,7 @@
             expand-trigger="hover"
             style="width:50%;"
             v-model="addressForm.address1"
-            :options="cityDate"
+            :options="cityData"
           ></el-cascader>
         </el-form-item>
         <el-form-item label="详细地址" prop="address2">
@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import cityDate from "./citydata";
+import cityData from "./citydata";
 export default {
   data() {
     return {
@@ -124,7 +124,7 @@ export default {
         ]
       },
       //省市县数据
-      cityDate,
+      cityData,
       //是否显示物流地址对话框
       dialogVisible: false,
       //地址数据
@@ -159,6 +159,7 @@ export default {
     },
     //点击实现修改地址弹框
     isShowEditAddress() {
+      
       this.addressDialogVisible = true;
     },
     //重置表单数据
